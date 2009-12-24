@@ -1,0 +1,233 @@
+=======================
+Containment constraints
+=======================
+
+Containment constraints allow us to express restrictions on the types
+of items that can be placed in containers or on the types of
+containers an item can be placed in.  We express these constraints in
+interfaces.  Let's define some container and item interfaces:
+
+    >>> from zope import interface, component
+    >>> from zojax.content.type import interfaces, item
+    >>> from zojax.content.type import container, constraints
+
+Let's create content and container
+
+    >>> class IBuddy(interfaces.IItem):
+    ...     pass
+
+    >>> class IBuddyFolder(interfaces.IContentContainer):
+    ...     pass
+
+    >>> class ITestContainer(interface.Interface):
+    ...     pass
+
+    >>> class Buddy(item.PersistentItem):
+    ...     interface.implements(IBuddy)
+
+    >>> class BuddyFolder(container.ContentContainer):
+    ...     interface.implements(IBuddyFolder)
+
+    >>> class TestContainer(container.ContentContainer):
+    ...     interface.implements(ITestContainer)
+
+    >>> import zojax.content.type
+    >>> from zope.configuration import xmlconfig
+    >>> context = xmlconfig.file('meta.zcml', zojax.content.type)
+
+    >>> context = xmlconfig.string("""
+    ... <configure xmlns:zojax="http://namespaces.zope.org/zojax" i18n_domain="zope">
+    ...   <zojax:content
+    ...     name="buddy"
+    ...     title="Buddy"
+    ...     class="zojax.content.TESTS.Buddy"
+    ...     schema="zojax.content.TESTS.IBuddy"
+    ...     containers="buddyfolder
+    ...                 unknown.unknown
+    ...                 zojax.content.type.tests.ITestContainer" />
+    ...
+    ...   <zojax:content
+    ...     name="buddyfolder"
+    ...     title="Buddy folder"
+    ...     class="zojax.content.TESTS.BuddyFolder"
+    ...     schema="zojax.content.TESTS.IBuddyFolder"
+    ...     type="zojax.content.type.interfaces.IExplicitlyAddable
+    ...           zojax.content.type.interfaces.IActiveType"
+    ...     contains="buddy
+    ...               zojax.content.type.tests.ITestContainer" />
+    ... 
+    ...   <zojax:content
+    ...     name="container"
+    ...     title="Container"
+    ...     class="zojax.content.TESTS.TestContainer"
+    ...     schema="zojax.content.TESTS.ITestContainer" />
+    ... 
+    ... </configure>""", context)
+
+Now, with these interfaces and content types in place, we can define
+Buddy and BuddyFolder classes and verify that we can put buddies in buddy
+folders:
+
+    >>> constraints.checkObject(BuddyFolder(), 'x', Buddy())
+
+If we try to use other containers or folders, we'll get errors:
+
+    >>> class Container(object):
+    ...     interface.implements(interfaces.IContentContainer)
+
+    >>> class Contained(object):
+    ...     interface.implements(interfaces.IItem)
+
+    >>> constraints.checkObject(BuddyFolder(), 'x', Contained())
+    Traceback (most recent call last):
+    ...
+    InvalidItemType: ...
+
+    >>> constraints.checkObject(Container(), 'x', Buddy())
+    Traceback (most recent call last):
+    ...
+    InvalidContainerType: ...
+
+    >>> constraints.checkObject(Buddy(), 'x', BuddyFolder())
+    Traceback (most recent call last):
+    ...
+    TypeError: Container is not a valid Zope container.
+
+    >>> constraints.checkObject(Container(), 'x', object())
+    Traceback (most recent call last):
+    ...
+    InvalidItemType: ...
+
+When we use 'containers' or 'contains' in content type declaration
+system creates two objects (IItemTypePrecondition, IContainerTypesConstraint)
+with same names as content type name
+
+    >>> precondition = constraints.contains(BuddyFolder())
+    >>> precondition
+    <zojax.content.type.constraints.ItemTypePrecondition ...>
+
+    >>> precondition == constraints.ctContains(
+    ...     interfaces.IContentType(BuddyFolder()))
+    True
+
+    >>> precondition.ifaces, precondition.types
+    ([<InterfaceClass zojax.content.type.tests.ITestContainer>], [u'buddy'])
+
+IItemTypePrecondition checks contained types as contenttype names
+or content type type.
+
+    >>> precondition.types = []
+
+    >>> constraints.checkObject(BuddyFolder(), 'x', Buddy())
+    Traceback (most recent call last):
+    ...
+    InvalidItemType: ...
+
+Lets use content type type. Same if we use:
+
+    ...   <zojax:content
+    ...     name="buddyfolder"
+    ...     title="Buddy folder"
+    ...     class="zojax.content.TESTS.BuddyFolder"
+    ...     schema="zojax.content.TESTS.IBuddyFolder"
+    ...     contains="zojax.content.TESTS.IBuddyType" />
+
+    >>> ct = component.getUtility(interfaces.IContentType, 'buddy')
+
+    >>> class IBuddyType(interface.Interface):
+    ...     pass
+
+    >>> interface.alsoProvides(ct, IBuddyType)
+    >>> precondition.ifaces = [IBuddyType]
+
+    >>> constraints.checkObject(BuddyFolder(), 'x', Buddy())
+
+
+IContainerTypesConstraint checks allowed containers for content
+
+    >>> validate = constraints.containers(Buddy())
+    >>> validate
+    <zojax.content.type.constraints.ContainerTypesConstraint ...>
+
+    >>> validate.ifaces, validate.types
+    ([<InterfaceClass zojax.content.type.tests.ITestContainer>], [u'buddyfolder', u'unknown.unknown'])
+
+    >>> validate.types = []
+
+    >>> validate(BuddyFolder())
+    Traceback (most recent call last):
+    ...
+    InvalidContainerType: (u'buddyfolder', [])
+
+    >>> validate(interfaces.IContentType(BuddyFolder()))
+    Traceback (most recent call last):
+    ...
+    InvalidContainerType: (u'buddyfolder', [])
+
+    >>> constraints.checkObject(BuddyFolder(), 'x', Buddy())
+    Traceback (most recent call last):
+    ...
+    InvalidContainerType: (u'buddyfolder', [])
+
+We can use content type type. Same if we use:
+
+    ...   <zojax:content
+    ...     name="buddy"
+    ...     title="Buddy"
+    ...     class="zojax.content.TESTS.Buddy"
+    ...     schema="zojax.content.TESTS.IBuddy"
+    ...     contains="zojax.content.TESTS.IBuddyFolderType" />
+
+    >>> ct = component.getUtility(interfaces.IContentType, 'buddyfolder')
+
+    >>> class IBuddyFolderType(interface.Interface):
+    ...     pass
+
+    >>> interface.alsoProvides(ct, IBuddyFolderType)
+    >>> validate.ifaces = [IBuddyFolderType]
+
+    >>> validate(BuddyFolder())
+    True
+
+    >>> constraints.checkObject(BuddyFolder(), 'x', Buddy())
+
+Check content type
+------------------
+
+    >>> ct = interfaces.IContentType(Buddy())
+
+    >>> constraints.checkContentType(BuddyFolder(), ct)
+
+    >>> constraints.checkContentType(object(), ct)
+    Traceback (most recent call last):
+    ...
+    TypeError: Container is not a valid Zope container.
+
+    >>> constraints.checkContentType(Container(), ct)
+    Traceback (most recent call last):
+    ...
+    InvalidContainerType: ...
+
+    >>> constraints.checkContentType(
+    ...     TestContainer(), interfaces.IContentType(BuddyFolder()))
+
+
+`contentConstraints` directive
+------------------------------
+
+    >>> from zope.app.container.constraints import IItemTypePrecondition
+
+    >>> precondition = component.getUtility(IItemTypePrecondition, 'buddy')
+    >>> print precondition.ifaces, precondition.types
+    [<InterfaceClass zojax.content.type.interfaces.IActiveType>] []
+
+    >>> context = xmlconfig.string("""
+    ... <configure xmlns:zojax="http://namespaces.zope.org/zojax" i18n_domain="zope">
+    ...   <zojax:contentConstraints
+    ...     name="buddy"
+    ...     contains="unknown2 unknown3" />
+    ... </configure>""", context)
+
+    >>> precondition = component.getUtility(IItemTypePrecondition, 'buddy')
+    >>> print precondition.ifaces, precondition.types
+    [<InterfaceClass zojax.content.type.interfaces.IActiveType>] [u'unknown2', u'unknown3']

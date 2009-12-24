@@ -1,0 +1,201 @@
+=================
+IContentContainer
+=================
+
+   >>> from zope import interface, component
+   >>> from zojax.content.type import interfaces, constraints
+   >>> from zojax.content.type.container import ContentContainer
+
+   >>> import zojax.content.type
+   >>> from zope.configuration import xmlconfig
+   >>> context = xmlconfig.file('meta.zcml', zojax.content.type)
+
+Let's register content container
+
+   >>> class IMyContainer(interfaces.IItem):
+   ...     pass
+
+   >>> class MyContainer(ContentContainer):
+   ...     interface.implements(IMyContainer)
+
+   >>> context = xmlconfig.string("""
+   ... <configure xmlns:zojax="http://namespaces.zope.org/zojax" i18n_domain="zojax">
+   ...   <zojax:content
+   ...     name="myContainer"
+   ...     title="My container"
+   ...     class="zojax.content.TESTS.MyContainer"
+   ...     schema="zojax.content.TESTS.IMyContainer"
+   ...     description="Simple container type." />
+   ... </configure>""", context)
+
+   >>> ct = component.getUtility(interfaces.IContentType, 'myContainer')
+
+   >>> container = MyContainer()
+
+
+Remove content
+--------------
+
+To remove contained items we should have `zojax.DeleteContent`
+permission. We need contained content type.
+
+   >>> context = xmlconfig.string("""
+   ... <configure xmlns:zojax="http://namespaces.zope.org/zojax" i18n_domain="zojax">
+   ...   <zojax:content
+   ...     name="test.content"
+   ...     title="Test content"
+   ...     class="zojax.content.type.tests.TestContent1"
+   ...     schema="zojax.content.type.tests.ITestContent1"
+   ...     description="Simple content type." />
+   ... </configure>""", context)
+
+   >>> ct = component.getUtility(interfaces.IContentType, 'test.content')
+   >>> bct = ct.__bind__(container)
+   >>> content = bct.add(bct.create('Test'), name='content')
+
+For testing we need principal and interaction
+
+   >>> class Principal:
+   ...     def __init__(self, id):
+   ...         self.id = id
+   >>> principal = Principal('zope.user')
+
+   >>> class Participation:
+   ...     interaction = None
+   ...     def __init__(self, principal):
+   ...         self.principal = principal
+
+   >>> participation = Participation(principal)
+
+   >>> from zope.security import management
+   >>> from zope.securitypolicy.zopepolicy import ZopeSecurityPolicy
+   >>> old = management.setSecurityPolicy(ZopeSecurityPolicy)
+   >>> management.endInteraction()
+   >>> management.newInteraction(participation)
+
+   >>> management.checkPermission('zojax.DeleteContent', content)
+   False
+
+   del container['content']
+   Traceback (most recent call last):
+   ...
+   Unauthorized: content
+
+Even if principal has this permission on container we won't able to
+delete item
+
+   >>> from zope.securitypolicy.interfaces import IPrincipalPermissionManager
+   >>> manager = IPrincipalPermissionManager(container)
+   >>> manager.grantPermissionToPrincipal('zojax.DeleteContent', 'zope.user')
+   >>> manager = IPrincipalPermissionManager(content)
+   >>> manager.denyPermissionToPrincipal('zojax.DeleteContent', 'zope.user')
+
+   >>> management.checkPermission('zojax.DeleteContent', container)
+   True
+
+   del container['content']
+   Traceback (most recent call last):
+   ...
+   Unauthorized: content
+
+   >>> manager = IPrincipalPermissionManager(container)
+   >>> manager.denyPermissionToPrincipal('zojax.DeleteContent', 'zope.user')
+   >>> manager = IPrincipalPermissionManager(content)
+   >>> manager.grantPermissionToPrincipal('zojax.DeleteContent', 'zope.user')
+
+   >>> del container['content']
+
+
+Reserved names
+--------------
+
+   >>> from zope.app.container.interfaces import INameChooser
+
+   >>> chooser = INameChooser(container)
+
+   >>> chooser.checkName('reserved', None)
+   True
+
+   >>> context = xmlconfig.string("""
+   ... <configure xmlns:zojax="http://namespaces.zope.org/zojax" i18n_domain="zojax">
+   ...   <zojax:reservedNames
+   ...     names="reserved"
+   ...     for="zojax.content.TESTS.IMyContainer" />
+   ... </configure>""", context)
+
+   >>> chooser.checkName('reserved', None)
+   Traceback (most recent call last):
+   ...
+   NameReserved: reserved
+
+
+Title based object names
+------------------------
+
+Use title as base for object name with objects with ITitleBasedName marker.
+
+Container should provide IContentContainer
+
+   >>> from zojax.content.type.interfaces import \
+   ...    IContentContainer, ITitleBasedName, INameChooserConfiglet
+   >>> IContentContainer.providedBy(container)
+   True
+
+   >>> chooser.context is container
+   True
+
+Content should provide ITitleBasedName
+
+   >>> from zojax.content.type.tests import ContentTypeWithTitleBasedName
+   >>> content = ContentTypeWithTitleBasedName()
+   >>> content.title = u'just title'
+   >>> ITitleBasedName.providedBy(content)
+   True
+
+   >>> chooser.__class__.__module__
+   'zojax.content.type.container'
+
+   >>> class Configlet(object):
+   ...     interface.implements(INameChooserConfiglet)
+   ...     short_url_enabled = False
+   ...     limit_words = 5
+
+   >>> configlet = Configlet()
+   >>> component.provideUtility(configlet)
+
+Name should be use title as base
+
+   >>> configlet.short_url_enabled = True
+   >>> chooser.chooseName('', content)
+   u'just-title'
+
+   >>> configlet.short_url_enabled = False
+   >>> chooser.chooseName('', content)
+   u'ContentTypeWithTitleBasedName'
+
+Should  ignore one letter words
+
+   >>> configlet.short_url_enabled = True
+   >>> content.title = 'just a title'
+   >>> chooser.chooseName('', content)
+   u'just-title'
+
+   >>> content.title = 'a just title'
+   >>> chooser.chooseName('', content)
+   u'just-title'
+
+   >>> content.title = 'just title a'
+   >>> chooser.chooseName('', content)
+   u'just-title'
+
+Should limit words by configlet limit_words value
+
+   >>> configlet.limit_words = 5
+   >>> content.title = 'just long title with some words'
+   >>> chooser.chooseName('', content)
+   u'just-long-title-with-some'
+
+   >>> configlet.limit_words = 2
+   >>> content.title = 'just long title with some words'
+   >>> chooser.chooseName('', content)
+   u'just-long'
