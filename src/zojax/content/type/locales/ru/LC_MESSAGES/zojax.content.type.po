@@ -1,0 +1,107 @@
+# #############################################################################
+#
+# Copyright (c) 2009 Zope Foundation and Contributors.
+# All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+# #############################################################################
+msgid ""
+msgstr ""
+"Project-Id-Version: Development/Unknown\n"
+"POT-Creation-Date: Mon May  4 12:01:03 2009\n"
+"PO-Revision-Date: 2008-10-31 13:28+0600\n"
+"Last-Translator: Nikolay Kim <fafhrd91@gmail.com>\n"
+"Language-Team: Zope 3 Developers <zope3-dev@zope.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: zope/app/locales/extract.py\n"
+
+#: src/zojax/content/type/contenttype.py:128
+msgid "Can't add content."
+msgstr "Невозможно добавить элемент."
+
+#: src/zojax/content/type/interfaces.py:161
+msgid "Name"
+msgstr "Имя"
+
+#: src/zojax/content/type/interfaces.py:162
+msgid "Content Type Name"
+msgstr "Имя контента"
+
+#: src/zojax/content/type/interfaces.py:167
+msgid "Content Type Title"
+msgstr "Заголовок контента"
+
+#: src/zojax/content/type/interfaces.py:172
+msgid "Content Type Description"
+msgstr "Описание контента"
+
+#: src/zojax/content/type/interfaces.py:37
+msgid "Publishing dates are wrong."
+msgstr ""
+
+#: src/zojax/content/type/interfaces.py:44
+#: src/zojax/content/type/interfaces.py:166
+msgid "Title"
+msgstr "Заголовок"
+
+#: src/zojax/content/type/interfaces.py:45
+msgid "Item title."
+msgstr "Заголовок элемента."
+
+#: src/zojax/content/type/interfaces.py:51
+#: src/zojax/content/type/interfaces.py:171
+msgid "Description"
+msgstr "Описание"
+
+#: src/zojax/content/type/interfaces.py:52
+msgid "Item description."
+msgstr "Краткое описание элемента."
+
+#: src/zojax/content/type/interfaces.py:61
+msgid "Effective Date"
+msgstr ""
+
+#: src/zojax/content/type/interfaces.py:62
+msgid ""
+"The date when the item will be published. If no date is selected the item "
+"will be published immediately."
+msgstr ""
+
+#: src/zojax/content/type/interfaces.py:67
+msgid "Expiration Date"
+msgstr ""
+
+#: src/zojax/content/type/interfaces.py:68
+msgid ""
+"The date when the item expires. This will automatically make the item "
+"invisible for others at the given date. If no date is chosen, it will never "
+"expire."
+msgstr ""
+
+#: src/zojax/content/type/interfaces.py:75
+msgid "Comment"
+msgstr "Коментарий"
+
+#: src/zojax/content/type/interfaces.py:76
+msgid "Comment will be added to the publishing history."
+msgstr ""
+
+#: src/zojax/content/type/permissions.zcml:13
+msgid "Delete content"
+msgstr "Удалить контент"
+
+#: src/zojax/content/type/permissions.zcml:5
+msgid "Add content"
+msgstr "Добавить контент"
+
+#: src/zojax/content/type/permissions.zcml:9
+msgid "Modify content"
+msgstr "Изменить контент"

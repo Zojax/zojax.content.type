@@ -1,0 +1,339 @@
+=======
+CHANGES
+=======
+
+1.0.2 (Unreleased)
+------------------
+
+- previousKey and nextKey methods added to Order
+
+
+1.0.1 (2009-08-18)
+------------------
+
+- Mark content class with content type type interfaces
+
+- Do not allow use interface that extends IContentType for content type type
+
+
+1.0.0 (2009-08-11)
+------------------
+
+- Permission zojax.AddContent removed
+
+- Removed default permissions for content
+
+- Added 'isAddable' method to ContentType class
+
+
+0.103.0 (2009-07-14)
+--------------------
+
+- Do not use one letter words in title based name chooser
+
+- Enable title based name chooser by default
+
+- Added setting for limiting number of words in title based name chooser
+
+
+0.102.0 (2009-06-21)
+--------------------
+
+- Disable IKeyReference adapter for ContentContainerConfiglet
+
+- IObjectCopier and IObjectMover adapter are not trusted
+
+- Content title based name chooser added
+
+- Content class should implement content schema
+
+- Added INamechooserConfiglet
+
+
+0.101.0 (2009-06-05)
+--------------------
+
+- IDraftedContent marker interface moved from zojax.content.draft
+
+- Copyright changed to 'Zope Foundation and Contributors'
+
+
+0.100.0 (2009-05-04)
+--------------------
+
+- Moved ContentContainerConfiglet from zojax.controlpanel
+
+- Fixed IObjectMovedEvent import
+
+- Remove zojax.controlpanel dependency
+
+
+0.99.9 (2009-04-13)
+-------------------
+
+- Fixed 'zojax:contentConstraints' and 'zojax:content' interface resolving
+
+
+0.99.8 (2009-04-13)
+-------------------
+
+- Added 'zojax:contentConstraints' directive
+
+- Do not use z3c.autoinclude
+
+
+0.99.7 (2009-03-12)
+-------------------
+
+- Override security proxy on adding content to contaner
+
+- Added IItemPublishing interfaces (expires, effective support)
+
+- Added IShareableContent marker interface for object that supports sharing
+
+- Moved IEmptyNamesNotAllowed from zojax.content.browser package
+
+- Mark controlpanel ConfigletData as orderable
+
+
+0.99.6 (2008-12-31)
+-------------------
+
+- Added content controlpanel category
+
+
+0.99.5 (2008-12-22)
+-------------------
+
+- Use new pagelet api
+
+- Remove old compatibility code
+
+
+0.99.4 (2008-12-18)
+-------------------
+
+- Try resole contentype name first in 'contains' and 'containers' attributes
+
+
+0.99.3 (2008-11-25)
+-------------------
+
+- Added slicing support to AnnotationOrder
+
+- Moved change order methods from IOrder to IReordable interface
+
+
+0.99.2 (2008-11-12)
+-------------------
+
+- Mark IContentView as IPageletType
+
+- Code/tests cleanup
+
+
+0.99.1 (2008-11-04)
+-------------------
+
+- Added IContentView marker interface
+
+
+0.99.0 (2008-11-02)
+-------------------
+
+- Split zojax.content to several subpackages
+
+
+0.18.0 (2008-10-31)
+-------------------
+
+- Do not use IOwnerAware expliticly for Item class
+
+- Added IAnnotatableOrder marker for object that supports
+  storing order data in annotations
+
+- Added different pagelet types for content view
+
+
+0.17.2 (2008-10-17)
+-------------------
+
+- Added translations: ru, nl
+
+
+0.17.1 (2008-10-15)
+-------------------
+
+- Fix available list content types
+
+
+0.17.0 (2008-10-15)
+-------------------
+
+- Prepare for removing auto generating content type maker interfaces.
+
+- `contenttype` attribute is makrer interface for content type.
+
+- `ctclass` custom content type implementation
+
+
+0.16.0 (2008-10-08)
+-------------------
+
+- Use 'contents.html' link for content in contents view
+
+- If container contains index.html content show it instead of listing
+
+- Added IRenameNotAllowed marker interface
+
+- Added container contents ordering
+
+- Use zojax.content i18n domain for transaltions
+
+- Use zc.copy for content copy
+
+
+0.15.0 (2008-08-28)
+-------------------
+
+- Added IPortalType,IActivePortalType types
+
+- Using content schema for content creation
+
+- Added short name validation for add/edit forms
+
+
+0.14.3 (2008-08-13)
+-------------------
+
+- Use new pageelement api
+
+- Added rename field to content edit form
+
+
+0.14.2 (2008-08-07)
+-------------------
+
+- Fixed content creation, if content class doesn't have__init__
+
+- Added `addform` attribute for zojax:content directive,
+  it allow use custom add form
+
+
+0.14.1 (2008-08-05)
+-------------------
+
+- Fixed container __delitem__
+
+- Fixed ContentType.create method
+
+- Tests updated
+
+
+0.14.0 (2008-08-04)
+-------------------
+
+- IItem is optional now
+
+- Custom `breadcrumb` for content objects
+
+- Added support for ordered containers
+
+
+0.13.2 (2008-07-28)
+-------------------
+
+- Fixed edit form
+
+
+0.13.1 (2008-07-24)
+-------------------
+
+- Added 'cancel' button to edit form
+
+
+0.13.0 (2008-05-26)
+-------------------
+
+- Moved content actions to zojax.ui.contentactions
+
+- Moved content byline to to zojax.ui.contentbyline
+
+- Use viewlet for rendering content layout
+
+
+0.12.0 (2008-04-08)
+-------------------
+
+- Added content actions
+
+
+0.11.4 (2008-04-01)
+-------------------
+
+- Code cleanup
+
+
+0.11.3 (2008-03-17)
+-------------------
+
+- Use zojax.contextlayout for context
+
+
+0.11.2 (2008-02-28)
+-------------------
+
+- Use z3c.autoinclude
+
+
+0.11.1 (2008-02-25)
+-------------------
+
+- Code cleanup
+
+
+0.11 (2008-02-20)
+-----------------
+
+- Replace zope.formlib with z3c.form
+
+
+0.10.2 (2008-02-18)
+-------------------
+
+- Removed `rwproperty.py` from package
+
+- Fixed bug with `View context` link in context information
+
+- Added default `adapter` to IContentAdding
+
+- Added `getContentType` to IContentAdding interface
+  returns bound IContentType object
+
+- Added viewlet structure for content view
+
+- Added viewlet structure for content byline
+
+
+0.10.1 (2008-02-12)
+-------------------
+
+- Move some code to zojax.contentextensions package
+
+
+0.10 (2008-02-04)
+-----------------
+
+- Rename 'for' to 'schema' for zojax:content directive
+
+
+0.9.1 (2008-02-02)
+------------------
+
+- Fixed missing import
+
+
+0.9.0 (2008-02-01)
+------------------
+
+- Initial release.

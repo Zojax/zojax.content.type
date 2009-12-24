@@ -1,0 +1,101 @@
+<configure
+   xmlns="http://namespaces.zope.org/zope"
+   xmlns:i18n="http://namespaces.zope.org/i18n"
+   xmlns:zojax="http://namespaces.zope.org/zojax"
+   i18n_domain="zojax.content.type">
+
+  <interface
+     name="Active content types"
+     interface=".interfaces.IActiveType"
+     type=".interfaces.IContentTypeType" />
+
+  <interface
+     name="Inactive content types"
+     interface=".interfaces.IInactiveType"
+     type=".interfaces.IContentTypeType" />
+
+  <interface
+     name="Portal type"
+     interface=".interfaces.IPortalType"
+     type=".interfaces.IContentTypeType" />
+
+  <interface
+     name="Active portal type"
+     interface=".interfaces.IActivePortalType"
+     type=".interfaces.IContentTypeType" />
+
+  <interface
+     name="Explictly addable content types"
+     interface=".interfaces.IExplicitlyAddable"
+     type=".interfaces.IContentTypeType" />
+
+  <!-- permissions -->
+  <permission
+     id="zojax.ModifyContent"
+     title="Modify content" />
+
+  <permission
+     id="zojax.DeleteContent"
+     title="Delete content" />
+
+  <!-- controlpanel support -->
+  <include file="configlet.zcml" />
+
+  <!-- constraints -->
+  <adapter factory=".constraints.contains" />
+  <adapter factory=".constraints.ctContains" />
+  <adapter factory=".constraints.containers" />
+
+  <!-- copier and mover -->
+  <adapter factory=".copypastemove.ContentMover" />
+  <adapter factory=".copypastemove.ContentCopier" />
+
+  <!-- default ISearchableText adapter -->
+  <adapter factory=".searchable.ContentSearchableText" />
+
+  <adapter
+     name="zojax.content-permissionChecker"
+     factory=".checker.PermissionChecker" />
+
+  <class class=".contenttype.ContentType">
+    <require
+       permission="zope.Public"
+       interface=".interfaces.IContentType
+		  zope.location.interfaces.ILocation" />
+  </class>
+
+  <!-- vocabularies -->
+  <utility
+     name="zojax.content.addableContent"
+     factory=".vocabulary.AddableContent" />
+
+  <utility
+     name="zojax.content.portalContent"
+     factory=".vocabulary.PortalContent" />
+
+  <!-- order -->
+  <adapter 
+     provides=".interfaces.IOrder"
+     factory=".order.Reordable" />
+
+  <subscriber handler=".order.itemMoved" />
+
+  <!-- container namechooser -->
+  <adapter factory=".container.NameChooser" />
+
+  <!-- title based namechooser -->
+  <adapter factory=".container.TitleBasedNameChooser" />
+
+  <!-- mark IContentView as pagelet type -->
+  <zojax:pageletType
+     name="content.type.view"
+     interface="zojax.content.type.interfaces.IContentView" />
+
+  <zojax:pageletType
+     name="content.type.preview"
+     interface="zojax.content.type.interfaces.IContentPreview" />
+
+  <!-- translations -->
+  <i18n:registerTranslations directory="locales"/>
+
+</configure>
