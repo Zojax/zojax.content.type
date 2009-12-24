@@ -1,0 +1,309 @@
+========================
+Container contents order
+========================
+
+   >>> from zope import interface, component
+   >>> from zojax.content.type import interfaces, constraints
+   >>> from zojax.content.type.container import ContentContainer
+
+   >>> import zojax.content.type
+   >>> from zope.configuration import xmlconfig
+   >>> context = xmlconfig.file('meta.zcml', zojax.content.type)
+
+   >>> class IMyContainer(interfaces.IItem):
+   ...     pass
+
+   >>> class MyContainer(ContentContainer):
+   ...     interface.implements(IMyContainer, interfaces.IAnnotatableOrder)
+
+   >>> context = xmlconfig.string("""
+   ... <configure xmlns:zojax="http://namespaces.zope.org/zojax" i18n_domain="zojax">
+   ...   <zojax:content
+   ...     name="myContainer"
+   ...     title="My container"
+   ...     class="zojax.content.TESTS.MyContainer"
+   ...     schema="zojax.content.TESTS.IMyContainer"
+   ...     description="Simple container type." />
+   ... </configure>""", context)
+
+   >>> ct = component.getUtility(interfaces.IContentType, 'myContainer')
+
+   >>> container = MyContainer()
+
+   >>> order = interfaces.IOrder(container)
+   >>> list(order.keys())
+   []
+
+   >>> context = xmlconfig.string("""
+   ... <configure xmlns:zojax="http://namespaces.zope.org/zojax" i18n_domain="zojax">
+   ...   <zojax:content
+   ...     name="test.content"
+   ...     title="Test content"
+   ...     class="zojax.content.type.tests.TestContent1"
+   ...     schema="zojax.content.type.tests.ITestContent1"
+   ...     description="Simple content type." />
+   ... </configure>""", context)
+
+   >>> ct = component.getUtility(interfaces.IContentType, 'test.content')
+   >>> bct = ct.__bind__(container)
+
+   >>> content = bct.add(bct.create('Test 1'), name=u'content1')
+   >>> content = bct.add(bct.create('Test 2'), name=u'content2')
+   >>> content = bct.add(bct.create('Test 3'), name=u'content3')
+   >>> content = bct.add(bct.create('Test 4'), name=u'content4')
+
+   >>> list(container.keys())
+   [u'content1', u'content2', u'content3', u'content4']
+
+   >>> list(order.keys())
+   [u'content1', u'content2', u'content3', u'content4']
+
+   >>> iter(order), tuple(iter(order))
+   (<iterator object ...>, (u'content1', u'content2', u'content3', u'content4'))
+
+   >>> order[1:2]
+   [<TestContent1 "content2">]
+   >>> order[:2]
+   [<TestContent1 "content1">, <TestContent1 "content2">]
+   >>> order[2:]
+   [<TestContent1 "content3">, <TestContent1 "content4">]
+   >>> order[:]
+   [<TestContent1 "content1">, <TestContent1 "content2">, <TestContent1 "content3">, <TestContent1 "content4">]
+
+   >>> order['content1']
+   <TestContent1 "content1">
+
+   >>> order.get('content2')
+   <TestContent1 "content2">
+
+   >>> order.get('content10') is None
+   True
+
+   >>> order.values()
+   [<TestContent1 "content1">, <TestContent1 "content2">, <TestContent1 "content3">, <TestContent1 "content4">]
+
+   >>> order.items()
+   [(u'content1', <TestContent1 "content1">), (u'content2', <TestContent1 "content2">), (u'content3', <TestContent1 "content3">), (u'content4', <TestContent1 "content4">)]
+
+   >>> order.addItem(u'content1')
+   >>> order.values()
+   [<TestContent1 "content1">, <TestContent1 "content2">, <TestContent1 "content3">, <TestContent1 "content4">]
+
+   >>> order.removeItem(u'content10')
+   >>> order.values()
+   [<TestContent1 "content1">, <TestContent1 "content2">, <TestContent1 "content3">, <TestContent1 "content4">]
+
+   >>> 'content1' in order
+   True
+
+   >>> 'content10' in order
+   False
+
+   >>> len(order) == len(container)
+   True
+
+Min and max key
+
+   >>> order.previousKey('content1')
+   u'content1'
+
+   >>> order.previousKey('content3')
+   u'content2'
+
+   >>> order.nextKey('content4')
+   u'content4'
+
+   >>> order.nextKey('content3')
+   u'content4'
+
+   >>> order.nextKey()
+   u'content4'
+
+   >>> order.previousKey()
+   u'content1'
+
+that should work even on not continious order
+   >>> content = bct.add(bct.create('Test 5'), name='content5')
+   >>> content = bct.add(bct.create('Test 6'), name='content6')
+   >>> list(order.keys())
+   [u'content1', u'content2', u'content3', u'content4', u'content5', u'content6']
+
+   >>> del container['content5']
+
+   >>> list(order.keys())
+   [u'content1', u'content2', u'content3', u'content4', u'content6']
+
+   >>> order.previousKey('content3')
+   u'content2'
+
+   >>> order.nextKey('content4')
+   u'content6'
+
+   >>> del container['content6']
+
+
+update order
+
+   >>> order.updateOrder('test')
+   Traceback (most recent call last):
+   ...
+   TypeError: order must be a tuple or a list.
+
+   >>> order.updateOrder([u'content4', u'content1', u'content3'])
+   Traceback (most recent call last):
+   ...
+   ValueError: Incompatible key set.
+
+   >>> order.updateOrder([u'content4', u'content1', u'content3', u'content6'])
+   Traceback (most recent call last):
+   ...
+   ValueError: Incompatible key set.
+
+   >>> order.updateOrder([u'content4', u'content1', u'content2', u'content3'])
+   >>> list(order.keys())
+   [u'content4', u'content1', u'content2', u'content3']
+
+   >>> order.updateOrder([u'content1', u'content2', u'content3', u'content4'])
+
+
+remove content
+
+   >>> content = bct.add(bct.create('Test 5'), name='content5')
+   >>> list(order.keys())
+   [u'content1', u'content2', u'content3', u'content4', u'content5']
+
+   >>> del container['content5']
+
+   >>> list(order.keys())
+   [u'content1', u'content2', u'content3', u'content4']
+
+
+Move up, order of names is matter
+
+   >>> state = order.moveUp((u'content3',))
+   >>> list(order.keys())
+   [u'content1', u'content3', u'content2', u'content4']
+
+   >>> state = order.moveUp((u'content3', u'content2'))
+   >>> list(order.keys())
+   [u'content3', u'content2', u'content1', u'content4']
+
+   >>> state = order.moveUp((u'content1', u'content2'))
+   >>> list(order.keys())
+   [u'content2', u'content1', u'content3', u'content4']
+
+   >>> order.moveUp((u'content2',))
+   False
+
+   >>> list(order.keys())
+   [u'content2', u'content1', u'content3', u'content4']
+
+   >>> order.moveUp((u'content10',))
+   False
+
+   >>> state = order.moveUp((u'content2', u'content4'))
+   >>> list(order.keys())
+   [u'content2', u'content1', u'content4', u'content3']
+
+   >>> state = order.moveUp((u'content2', u'content1', 'content4'))
+   >>> list(order.keys())
+   [u'content2', u'content1', u'content4', u'content3']
+
+
+Move top
+
+   >>> state = order.moveTop((u'content1',))
+   >>> list(order.keys())
+   [u'content1', u'content2', u'content4', u'content3']
+
+   >>> state = order.moveTop((u'content2', u'content3'))
+   >>> list(order.keys())
+   [u'content2', u'content3', u'content1', u'content4']
+
+   >>> state = order.moveTop((u'content2', u'content1'))
+   >>> list(order.keys())
+   [u'content2', u'content1', u'content3', u'content4']
+
+   >>> order.moveTop((u'content2',))
+   False
+
+   >>> list(order.keys())
+   [u'content2', u'content1', u'content3', u'content4']
+
+   >>> status = order.moveUp(('content1', 'content4'))
+   >>> list(order.keys())
+   [u'content1', u'content2', u'content4', u'content3']
+
+   >>> order.moveTop((u'content10',))
+   False
+
+   >>> state = order.moveTop((u'content1', u'content2', 'content4'))
+   >>> list(order.keys())
+   [u'content1', u'content2', u'content4', u'content3']
+
+
+Move down
+
+   >>> state = order.moveDown((u'content4',))
+   >>> list(order.keys())
+   [u'content1', u'content2', u'content3', u'content4']
+
+   >>> state = order.moveDown((u'content1', u'content3'))
+   >>> list(order.keys())
+   [u'content2', u'content1', u'content4', u'content3']
+
+   >>> state = order.moveDown((u'content1', u'content3'))
+   >>> list(order.keys())
+   [u'content2', u'content4', u'content1', u'content3']
+
+   >>> order.moveDown((u'content3',))
+   False
+   >>> list(order.keys())
+   [u'content2', u'content4', u'content1', u'content3']
+
+   >>> order.moveDown((u'content10',))
+   False
+
+   >>> state = order.moveDown((u'content1', 'content3'))
+   >>> list(order.keys())
+   [u'content2', u'content4', u'content1', u'content3']
+
+   >>> state = order.moveDown((u'content2', u'content4'))
+   >>> list(order.keys())
+   [u'content1', u'content2', u'content4', u'content3']
+
+
+Move bottom
+
+   >>> state = order.moveBottom((u'content4',))
+   >>> list(order.keys())
+   [u'content1', u'content2', u'content3', u'content4']
+
+   >>> state = order.moveBottom((u'content2', u'content3'))
+   >>> list(order.keys())
+   [u'content1', u'content4', u'content2', u'content3']
+
+   >>> state = order.moveBottom((u'content4', u'content3'))
+   >>> list(order.keys())
+   [u'content1', u'content2', u'content4', u'content3']
+
+   >>> order.moveBottom((u'content3',))
+   False
+   >>> list(order.keys())
+   [u'content1', u'content2', u'content4', u'content3']
+
+   >>> order.moveTop((u'content10',))
+   False
+   >>> state = order.moveBottom((u'content2', u'content4', 'content3'))
+   >>> list(order.keys())
+   [u'content1', u'content2', u'content4', u'content3']
+
+Rebuild, rebuild order according containers keys order.
+
+   >>> tuple(container.keys()) == tuple(order.keys())
+   False
+
+   >>> order.rebuild()
+
+   >>> tuple(container.keys()) == tuple(order.keys())
+   True

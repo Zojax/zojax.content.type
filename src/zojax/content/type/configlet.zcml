@@ -1,0 +1,31 @@
+<configure
+   xmlns="http://namespaces.zope.org/zope"
+   xmlns:zcml="http://namespaces.zope.org/zcml"
+   xmlns:zojax="http://namespaces.zope.org/zojax"
+   zcml:condition="installed zojax.controlpanel">
+
+  <include package="zojax.controlpanel" file="meta.zcml" />
+  <include package="zojax.controlpanel" />
+
+  <!-- controlpanel data -->
+  <adapter
+     factory=".order.Reordable"
+     for="zojax.controlpanel.storage.ConfigletData"
+     provides=".interfaces.IOrder" />
+
+  <!-- configlet for content namechooser settings -->
+  <zojax:configlet
+     name="content.namechooser"
+     title="Name chooser"
+     schema=".interfaces.INameChooserConfiglet"
+     description="Content type name chooser configuration."
+     permission="zojax.Configure">
+    <require
+       permission="zope.Public"
+       interface=".interfaces.INameChooserConfiglet" />
+  </zojax:configlet>
+
+  <!-- disable keyreference for ContentContainerConfiglet -->
+  <adapter factory=".configlet.keyReference" />
+
+</configure>

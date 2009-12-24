@@ -1,0 +1,227 @@
+=========================
+`zojax:content` directive
+=========================
+
+Registration new content type with zcml directive.
+
+   >>> from zope import interface, component
+
+Load directive declaration
+
+   >>> import zojax.content.type
+   >>> from zope.configuration import xmlconfig
+   >>> context = xmlconfig.file('meta.zcml', zojax.content.type)
+
+   >>> from zojax.content.type import interfaces, tests
+
+Let's create register simple content types
+
+   >>> context = xmlconfig.string("""
+   ... <configure xmlns:zojax="http://namespaces.zope.org/zojax" i18n_domain="zojax">
+   ...   <zojax:content
+   ...     name="test.content1"
+   ...     title="Test content1"
+   ...     class="zojax.content.type.tests.TestContent1"
+   ...     schema="zojax.content.type.tests.ITestContent1"
+   ...     type="zojax.content.type.tests.ITestContentType
+   ...           zojax.content.type.interfaces.IActiveType"
+   ...     description="Simple content type." />
+   ...
+   ...   <zojax:content
+   ...     name="test.content2"
+   ...     title="Test content2"
+   ...     class="zojax.content.type.tests.TestContent2"
+   ...     schema="zojax.content.type.tests.ITestContent2"
+   ...     type="zojax.content.type.interfaces.IInactiveType
+   ...           zojax.content.type.tests.ITestContentType"
+   ...     description="Simple content type." />
+   ...
+   ...   <zojax:content
+   ...     name="test.content3"
+   ...     title="Test content3"
+   ...     class="zojax.content.type.tests.TestContent3"
+   ...     schema="zojax.content.type.tests.ITestContent3"
+   ...	   ctclass="zojax.content.type.tests.CustomContentType"
+   ...     description="Simple content type." />
+   ... </configure>""", context)
+
+Now contet type registered in system, it's registered in system by it's name.
+
+   >>> ct1 = component.getUtility(interfaces.IContentType, 'test.content1')
+   >>> ct2 = component.getUtility(interfaces.IContentType, 'test.content2')
+   >>> ct3 = component.getUtility(interfaces.IContentType, 'test.content3')
+
+   >>> interfaces.IContentType.providedBy(ct1) and \
+   ...   interfaces.IContentType.providedBy(ct2)
+   True
+
+   >>> ct1.name
+   u'test.content1'
+
+We can supply custom interface that should provide new content type, 
+like for test.content2
+
+   >>> tests.ITestContentType.providedBy(ct1)
+   True
+
+If we don't supply interface, new interface will be created. As id we use 
+content type name. This is usefull for situation like creating custom add form.
+
+   >>> zojax.content.test_content2
+   <InterfaceClass zojax.content.test_content2>
+
+   >>> zojax.content.test_content2.providedBy(ct2)
+   True
+
+Also content class now implement IContent interface
+
+   >>> interfaces.IContent.implementedBy(tests.TestContent1)
+   True
+
+By default content is IActiveType
+
+   >>> interfaces.IActiveType.providedBy(ct3)
+   True
+
+
+ContentType type
+----------------
+
+We can add additional meaning to content type by custom types. For example
+by default zojax.content has two type active content type and inactive content
+type. any content type can be or in active or in inactive state.
+
+   >>> interfaces.IActiveType.providedBy(ct1)
+   True
+
+test.content2 type is explicetly set as inactive
+
+   >>> interfaces.IInactiveType.providedBy(ct2) \
+   ...   and not interfaces.IActiveType.providedBy(ct2)
+   True
+
+We can get all content type for type.
+
+   >>> for name, ct in component.getUtilitiesFor(interfaces.IActiveType):
+   ...   print name, ct
+   test.content3 <ContentType:zojax.content.type.tests.CustomContentType ...>
+   test.content1 <ContentType:zojax.content.type.contenttype.ContentType ...>
+
+For custom type
+
+   >>> for name, ct in component.getUtilitiesFor(tests.ITestContentType):
+   ...   print name, ct
+   test.content2 <ContentType:zojax.content.type.contenttype.ContentType ...>
+   test.content1 <ContentType:zojax.content.type.contenttype.ContentType ...>
+
+Without factory content type authomaticlly will be inactive 
+
+   >>> context = xmlconfig.string("""
+   ... <configure xmlns:zojax="http://namespaces.zope.org/zojax" i18n_domain="zojax">
+   ...   <zojax:content
+   ...     name="test.content6"
+   ...     title="Test content6"
+   ...     schema="zojax.content.type.tests.ITestContent2" 
+   ...     type="zojax.content.type.interfaces.IActiveType" />
+   ... </configure>""", context)
+
+   >>> ct6 = component.getUtility(interfaces.IContentType, 'test.content6')
+   >>> interfaces.IInactiveType.providedBy(ct6)
+   True
+
+Inactive type have higher 
+
+   >>> interfaces.IActiveType.providedBy(ct6)
+   False
+
+
+Custom content type implementation
+----------------------------------
+
+We can use custom content type implementation with `ctclass` attributes
+
+   >>> ct3 = component.getUtility(interfaces.IContentType, 'test.content3')
+   
+   >>> isinstance(ct3, tests.CustomContentType)
+   True
+
+
+Content directive also register adapter for instance that allow get content 
+type object.
+
+   >>> ob = ct1.create()
+   >>> ob_ct = interfaces.IContentType(ob)
+   
+   >>> ob_ct.name == ct1.name
+   True
+
+Custom content type implementation should implements IContentType interface
+
+   >>> context = xmlconfig.string("""
+   ... <configure xmlns:zojax="http://namespaces.zope.org/zojax" i18n_domain="zojax">
+   ...   <zojax:content
+   ...     name="test.content6"
+   ...     title="Test content6"
+   ...     schema="zojax.content.type.tests.ITestContent2" 
+   ...	   ctclass="zojax.content.type.tests.CustomContentType1" />
+   ... </configure>""", context)
+   Traceback (most recent call last):
+   ...
+   ZopeXMLConfigurationError:...
+
+
+Content Contains Types
+----------------------
+
+We can explicitly define contains types, we can mix interfaces 
+and type names
+
+   >>> context = xmlconfig.string("""
+   ... <configure xmlns:zojax="http://namespaces.zope.org/zojax" i18n_domain="zojax">
+   ...   <zojax:content
+   ...     name="test.content7"
+   ...     title="Test content7"
+   ...     class="zojax.content.type.tests.TestContent2"
+   ...     schema="zojax.content.type.tests.ITestContent2"
+   ...     contains="zojax.content.type.tests.ITestContent1 test.content1"
+   ...     type="zojax.content.type.interfaces.IActiveType" />
+   ... </configure>""", context)
+
+
+Content Containers
+------------------
+
+We can explicitly define container that can contain this type
+
+   >>> context = xmlconfig.string("""
+   ... <configure xmlns:zojax="http://namespaces.zope.org/zojax" i18n_domain="zojax">
+   ...   <zojax:content
+   ...     name="test.content8"
+   ...     title="Test content8"
+   ...     class="zojax.content.type.tests.TestContent2"
+   ...     schema="zojax.content.type.tests.ITestContent2"
+   ...     containers="test.content1"
+   ...     type="zojax.content.type.interfaces.IActiveType" />
+   ... </configure>""", context)
+
+
+Reserved Names
+--------------
+
+Names that can't be used as contained item name
+
+   >>> context = xmlconfig.string("""
+   ... <configure xmlns:zojax="http://namespaces.zope.org/zojax" i18n_domain="zojax">
+   ...   <zojax:reservedNames
+   ...     names="reserved"
+   ...     for="zojax.content.type.interfaces.IContentContainer" />
+   ... </configure>""", context)
+
+We can add more reserved names later
+
+   >>> context = xmlconfig.string("""
+   ... <configure xmlns:zojax="http://namespaces.zope.org/zojax" i18n_domain="zojax">
+   ...   <zojax:reservedNames
+   ...     names="reserved2"
+   ...     for="zojax.content.type.interfaces.IContentContainer" />
+   ... </configure>""", context)
