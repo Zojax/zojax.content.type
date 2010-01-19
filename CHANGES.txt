@@ -1,5 +1,5 @@
 trunk (Unreleased)
-==================
+------------------
 
 - zojax initial release
 
