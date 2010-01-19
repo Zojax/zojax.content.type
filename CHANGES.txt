@@ -1,5 +1,10 @@
-trunk (Unreleased)
-------------------
+trunk (2010-01-19)
+==================
+
+  - xxx [Ingeniweb]
+
+1.1.1 (2010-01-19)
+==================
 
 - zojax initial release
 
