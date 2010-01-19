@@ -15,10 +15,10 @@
 
   <!-- configlet for content namechooser settings -->
   <zojax:configlet
-     name="content.namechooser"
-     title="Name chooser"
+     name="namechooser"
+     title="URL generation"
      schema=".interfaces.INameChooserConfiglet"
-     description="Content type name chooser configuration."
+     description="Content item url generation configuration."
      permission="zojax.Configure">
     <require
        permission="zope.Public"
