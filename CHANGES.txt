@@ -3,7 +3,7 @@ CHANGES
 =======
 
 
-trunk (Unreleased)
+1.1.1 (Unreleased)
 ==================
 
 
