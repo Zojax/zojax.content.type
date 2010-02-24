@@ -227,11 +227,11 @@ def contentHandler(_context, schema, name, title, class_=None,
     adapter(_context, (ClassToTypeAdapter(name),), IContentType, (schema,))
 
     if class_ is not None:
+        clsifaces = list(interface.implementedBy(class_))
         if not IContent.implementedBy(class_):
-            clsifaces = list(interface.implementedBy(class_))
             clsifaces.append(IContent)
-            clsifaces.extend(type)
-            interface.classImplements(class_, clsifaces)
+        clsifaces.extend(type)
+        interface.classImplements(class_, clsifaces)
 
     # process constraints
     _context.action(
