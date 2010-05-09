@@ -72,12 +72,18 @@ class TitleBasedNameChooser(BaseNameChooser):
         if configlet is not None and configlet.short_url_enabled and not name:
             dc = IDCDescriptiveProperties(object, None)
             if dc is not None:
-                name = string.strip(
+                name = self.getName(dc.title)
+
+        return super(TitleBasedNameChooser, self).chooseName(name, object)
+
+    @staticmethod
+    def getName(title):
+        configlet = queryUtility(INameChooserConfiglet)
+        name = string.strip(
                     re.sub(
                         r'-{2,}', '-',
                         re.sub('^\w-|-\w-|-\w$', '-',
-                        re.sub(r'\W', '-', string.strip(dc.title)))), '-').lower()
-                if configlet.limit_words:
-                    name = '-'.join(name.split('-')[0:configlet.limit_words])
-
-        return super(TitleBasedNameChooser, self).chooseName(name, object)
+                        re.sub(r'\W', '-', string.strip(title)))), '-').lower()
+        if configlet.limit_words:
+            name = '-'.join(name.split('-')[0:configlet.limit_words])
+        return name
