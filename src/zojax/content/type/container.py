@@ -71,6 +71,8 @@ class TitleBasedNameChooser(BaseNameChooser):
         configlet = queryUtility(INameChooserConfiglet)
         if configlet is not None and configlet.short_url_enabled and not name:
             dc = IDCDescriptiveProperties(object, None) or IItem(object)
+            if dc is None:
+                dc = IItem(object, None)
             if dc is not None:
                 name = self.getName(dc.title)
         return super(TitleBasedNameChooser, self).chooseName(name, object)
