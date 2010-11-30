@@ -83,8 +83,8 @@ class TitleBasedNameChooser(BaseNameChooser):
         name = string.strip(
                     re.sub(
                         r'-{2,}', '-',
-                        re.sub('^\w-|-\w-|-\w$', '-',
-                        re.sub(r'\W', '-', string.strip(title)))), '-').lower()
+                        re.sub(re.compile('^\w-|-\w-|-\w$', flags=re.UNICODE), '-',
+                        re.sub(re.compile(r'\W', flags=re.UNICODE), '-', string.strip(title)))), '-').lower()
         if configlet.limit_words:
             name = '-'.join(name.split('-')[0:configlet.limit_words])
         return name
