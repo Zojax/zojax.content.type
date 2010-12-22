@@ -144,6 +144,15 @@ class IOrder(interface.Interface):
         Raise an exception if
         no such key exists.
         """
+        
+    def keyPosition(key=None):
+        """Return the key position.
+
+        If a key argument if provided and not None, return the key position in order.
+        Raise an exception if
+        no such key exists.
+        """
+
 
 class IReordable(interface.Interface):
     """ reordable contents """

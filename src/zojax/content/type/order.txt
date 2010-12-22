@@ -121,6 +121,13 @@ Min and max key
 
    >>> order.previousKey()
    u'content1'
+   
+   >>> order.keyPosition('content3')
+   3
+
+   >>> order.keyPosition('content4')
+   4
+
 
 that should work even on not continious order
    >>> content = bct.add(bct.create('Test 5'), name='content5')

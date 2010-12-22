@@ -136,6 +136,11 @@ class AnnotatableOrder(object):
             return self.order[self.order.maxKey(index-1)]
         except (ValueError, KeyError):
             return self.order[index]
+        
+    def keyPosition(self, key=None):
+        if key is None:
+            return 0
+        return self.border[key]
 
 
 class Reordable(AnnotatableOrder):
