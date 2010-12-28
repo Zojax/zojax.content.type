@@ -141,6 +141,9 @@ class AnnotatableOrder(object):
         if key is None:
             return 0
         return self.border[key]
+    
+    def getByPosition(self, position=None):
+        return self.context[self.order[position]]
 
 
 class Reordable(AnnotatableOrder):

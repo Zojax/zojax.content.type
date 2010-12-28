@@ -127,6 +127,12 @@ Min and max key
 
    >>> order.keyPosition('content4')
    4
+   
+   >>> order.getByPosition(1)
+   <TestContent1 "content1">
+   
+   >>> order.getByPosition(4)
+   <TestContent1 "content4">
 
 
 that should work even on not continious order
