@@ -20,7 +20,7 @@ from BTrees.OIBTree import OIBTree
 from BTrees.IOBTree import IOBTree
 
 from zope import interface, component
-from zope.security.proxy import removeSecurityProxy
+from zope.proxy import removeAllProxies
 from zope.annotation.interfaces import IAnnotations
 from zope.app.container.contained import notifyContainerModified
 from zope.app.container.interfaces import IObjectMovedEvent
@@ -34,7 +34,7 @@ class AnnotatableOrder(object):
     ANNOTATION_KEY = 'zojax.content-containerorder'
 
     def __init__(self, context):
-        annotations = IAnnotations(removeSecurityProxy(context))
+        annotations = IAnnotations(removeAllProxies(context))
 
         self.context = context
         self.annotations = annotations
