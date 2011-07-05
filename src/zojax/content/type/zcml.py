@@ -232,7 +232,7 @@ def contentHandler(_context, schema, name, title, class_=None,
             clsifaces.append(IContent)
         clsifaces.extend(type)
         interface.classImplements(class_, clsifaces)
-
+        
     # process constraints
     _context.action(
         discriminator = ('zojax.content:contentTypeConstraints', name),
