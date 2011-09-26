@@ -11,6 +11,8 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
+from zope.event import notify
+from zope.lifecycleevent import ObjectModifiedEvent
 """
 
 $Id$
@@ -181,7 +183,8 @@ class Reordable(AnnotatableOrder):
             border[name1] = idx2
             border[name2] = idx
             changed = True
-
+            notify(ObjectModifiedEvent(self.context[name1]))
+            notify(ObjectModifiedEvent(self.context[name2]))
         return changed
 
     def moveTop(self, names):
@@ -210,6 +213,7 @@ class Reordable(AnnotatableOrder):
             del order[idx]
 
             changed = True
+            notify(ObjectModifiedEvent(self.context[name]))
 
         return changed
 
@@ -251,6 +255,8 @@ class Reordable(AnnotatableOrder):
             border[name1] = idx2
             border[name2] = idx
             changed = True
+            notify(ObjectModifiedEvent(self.context[name1]))
+            notify(ObjectModifiedEvent(self.context[name2]))
 
         return changed
 
@@ -279,6 +285,7 @@ class Reordable(AnnotatableOrder):
 
             del order[idx]
             changed = True
+            notify(ObjectModifiedEvent(self.context[name]))
 
         return changed
 
