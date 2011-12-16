@@ -1,0 +1,123 @@
+##############################################################################
+#
+# Copyright (c) 2003-2004 Zope Corporation and Contributors.
+# All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+msgid ""
+msgstr ""
+"Project-Id-Version: Development/Unknown\n"
+"POT-Creation-Date: Thu Dec  8 22:42:27 2011\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Zope 3 Developers <zope3-dev@zope.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: zope/app/locales/extract.py\n"
+
+#: src/zojax/content/type/configlet.zcml:17
+msgid "URL generation"
+msgstr ""
+
+#: src/zojax/content/type/configlet.zcml:17
+msgid "Content item url generation configuration."
+msgstr ""
+
+#: src/zojax/content/type/configure.zcml:33
+msgid "Modify content"
+msgstr ""
+
+#: src/zojax/content/type/configure.zcml:37
+msgid "Delete content"
+msgstr ""
+
+#: src/zojax/content/type/contenttype.py:128
+msgid "Can't add content."
+msgstr ""
+
+#: src/zojax/content/type/interfaces.py:197
+msgid "Name"
+msgstr ""
+
+#: src/zojax/content/type/interfaces.py:198
+msgid "Content Type Name"
+msgstr ""
+
+#: src/zojax/content/type/interfaces.py:203
+msgid "Content Type Title"
+msgstr ""
+
+#: src/zojax/content/type/interfaces.py:208
+msgid "Content Type Description"
+msgstr ""
+
+#: src/zojax/content/type/interfaces.py:329
+msgid "Short-url generation"
+msgstr ""
+
+#: src/zojax/content/type/interfaces.py:330
+msgid "Enable short-url generation."
+msgstr ""
+
+#: src/zojax/content/type/interfaces.py:335
+msgid "Limit words count"
+msgstr ""
+
+#: src/zojax/content/type/interfaces.py:336
+msgid "Limit words count."
+msgstr ""
+
+#: src/zojax/content/type/interfaces.py:37
+msgid "Publishing dates are wrong."
+msgstr ""
+
+#: src/zojax/content/type/interfaces.py:44
+#: src/zojax/content/type/interfaces.py:202
+msgid "Title"
+msgstr ""
+
+#: src/zojax/content/type/interfaces.py:45
+msgid "Item title."
+msgstr ""
+
+#: src/zojax/content/type/interfaces.py:51
+#: src/zojax/content/type/interfaces.py:207
+msgid "Description"
+msgstr ""
+
+#: src/zojax/content/type/interfaces.py:52
+msgid "Brief summary of your content item."
+msgstr ""
+
+#: src/zojax/content/type/interfaces.py:61
+msgid "Effective Date"
+msgstr ""
+
+#: src/zojax/content/type/interfaces.py:62
+msgid "The date when the item will be published. If no date is selected the item will be published immediately."
+msgstr ""
+
+#: src/zojax/content/type/interfaces.py:67
+msgid "Expiration Date"
+msgstr ""
+
+#: src/zojax/content/type/interfaces.py:68
+msgid "The date when the item expires. This will automatically make the item invisible for others at the given date. If no date is chosen, it will never expire."
+msgstr ""
+
+#: src/zojax/content/type/interfaces.py:75
+msgid "Comment"
+msgstr ""
+
+#: src/zojax/content/type/interfaces.py:76
+msgid "Comment will be added to the publishing history."
+msgstr ""
+
