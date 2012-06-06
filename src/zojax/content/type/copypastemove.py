@@ -26,7 +26,8 @@ from zope.copypastemove.interfaces import IObjectMover, IObjectCopier
 
 from zc.copy import copy
 
-from zojax.content.type.interfaces import IContent
+from zojax.content.type.interfaces import IContent, IRenameNotAllowed,\
+    IUnremoveableContent
 from zojax.content.type.constraints import checkObject
 
 
@@ -100,7 +101,8 @@ class ContentCopier(object):
         return new_name
 
     def copyable(self):
-        return True
+        return not IRenameNotAllowed.providedBy(self.context) \
+            and not IUnremoveableContent.providedBy(self.context)
 
     def copyableTo(self, target, name=None):
         if name is None:
