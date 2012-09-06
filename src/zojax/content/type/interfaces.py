@@ -104,6 +104,13 @@ class IUnremoveableContent(interface.Interface):
     """ marker interface for content item that can't be
     removed from container """
 
+class IUncopyableContent(interface.Interface):
+    """ marker interface for content item that can't be
+    copied """
+
+class IUnpastableContent(interface.Interface):
+    """ marker interface for content item that can't be
+    cutted and pasted """
 
 class IContentContainer(interface.Interface):
     """ container for content """
